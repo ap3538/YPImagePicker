@@ -411,8 +411,6 @@ class CustomYPPickerVC: YPPickerVC {
     }
 }
 
-
-
 open class YPPickerVC: YPBottomPager, YPBottomPagerDelegate {
 
     let albumsManager = YPAlbumsManager()
