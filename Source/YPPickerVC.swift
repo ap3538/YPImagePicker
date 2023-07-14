@@ -397,7 +397,7 @@ protocol YPPickerVCDelegate: AnyObject {
     func shouldAddToSelection(indexPath: IndexPath, numSelections: Int) -> Bool
 }
 
-class ViewController: UIViewController {
+class ViewController: UIViewController, YPPickerVCDelegate {
     @IBOutlet weak var vImage: UIImageView!
     var config = YPImagePickerConfiguration()
     var selectedItems = [YPMediaItem]()
@@ -417,32 +417,41 @@ class ViewController: UIViewController {
         config.wordings.cancel = "Cancel"
         config.wordings.libraryTitle = "Gallery"
         config.hidesStatusBar = false
+        
+        createManageButton()
     }
     
-    @available(iOS 14, *)
-    @IBAction func manageButtonTapped(_ sender: Any) {
-        var picker: YPImagePicker? // Declare `picker` variable here
-
-        if #available(iOS 14, *) {
-            picker = YPImagePicker(configuration: config)
-        } else {
-            // Fallback on earlier versions
-        }
-
-        picker?.didFinishPicking { [unowned picker] items, _ in
-            self.selectedItems = items
-            if let photo = items.singlePhoto {
-                self.vImage.image = photo.image
-            }
-            picker?.dismiss(animated: true, completion: nil)
-        }
-
-        if let picker = picker {
-            present(picker, animated: true, completion: nil)
-        }
+    func createManageButton() {
+        let manageButton = UIButton()
+        manageButton.setTitle("Manage", for: .normal)
+        manageButton.setTitleColor(.systemBlue, for: .normal)
+        manageButton.addTarget(self, action: #selector(manageButtonTapped), for: .touchUpInside)
+        view.sv(manageButton)
+        manageButton.centerHorizontally().bottom(30)
     }
-
+    
+    @objc func manageButtonTapped() {
+        let picker = YPPickerVC()
+        picker.pickerVCDelegate = self
+        picker.didSelectItems = { [weak self] items in
+            self?.selectedItems = items
+            if let photo = items.singlePhoto {
+                self?.vImage.image = photo.image
+            }
+        }
+        present(picker, animated: true, completion: nil)
+    }
+    
+    func libraryHasNoItems() {
+        print("Library has no items.")
+    }
+    
+    func shouldAddToSelection(indexPath: IndexPath, numSelections: Int) -> Bool {
+        print("Should add item at index: \(indexPath.row)")
+        return true
+    }
 }
+
   
 open class YPPickerVC: YPBottomPager, YPBottomPagerDelegate {
     
