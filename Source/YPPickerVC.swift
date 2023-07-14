@@ -401,6 +401,7 @@ class ViewController: UIViewController, YPPickerVCDelegate {
     @IBOutlet weak var vImage: UIImageView!
     var config = YPImagePickerConfiguration()
     var selectedItems = [YPMediaItem]()
+    let manageButton = UIButton()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -422,22 +423,24 @@ class ViewController: UIViewController, YPPickerVCDelegate {
     }
     
     func createManageButton() {
-        let manageButton = UIButton()
         manageButton.setTitle("Manage", for: .normal)
         manageButton.setTitleColor(.systemBlue, for: .normal)
         manageButton.addTarget(self, action: #selector(manageButtonTapped), for: .touchUpInside)
-        view.sv(manageButton)
-        manageButton.centerHorizontally().bottom(30)
+        view.addSubview(manageButton)
+        manageButton.translatesAutoresizingMaskIntoConstraints = false
+        manageButton.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        manageButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -30).isActive = true
     }
     
     @objc func manageButtonTapped() {
-        let picker = YPPickerVC()
+        let picker = YPImagePicker(configuration: config)
         picker.pickerVCDelegate = self
-        picker.didSelectItems = { [weak self] items in
-            self?.selectedItems = items
+        picker.didFinishPicking { [unowned picker] items, _ in
+            self.selectedItems = items
             if let photo = items.singlePhoto {
-                self?.vImage.image = photo.image
+                self.vImage.image = photo.image
             }
+            picker.dismiss(animated: true, completion: nil)
         }
         present(picker, animated: true, completion: nil)
     }
@@ -451,6 +454,7 @@ class ViewController: UIViewController, YPPickerVCDelegate {
         return true
     }
 }
+
 
   
 open class YPPickerVC: YPBottomPager, YPBottomPagerDelegate {
