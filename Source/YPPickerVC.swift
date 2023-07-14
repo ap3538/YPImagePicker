@@ -397,20 +397,6 @@ protocol YPPickerVCDelegate: AnyObject {
     func shouldAddToSelection(indexPath: IndexPath, numSelections: Int) -> Bool
 }
 
-class CustomYPPickerVC: YPPickerVC {
-    override func updateUI() {
-        super.updateUI()
-
-        let manageButton = UIBarButtonItem(title: "Manage", style: .plain, target: self, action: #selector(manageButtonTapped))
-        navigationItem.rightBarButtonItem = manageButton
-    }
-
-    @objc func manageButtonTapped() {
-        // Handle "Manage" button tap
-        print("Manage button tapped")
-    }
-}
-
 open class YPPickerVC: YPBottomPager, YPBottomPagerDelegate {
 
     let albumsManager = YPAlbumsManager()
@@ -673,13 +659,14 @@ open class YPPickerVC: YPBottomPager, YPBottomPagerDelegate {
                                                                target: self,
                                                                action: #selector(close))
         }
+        
         switch mode {
         case .library:
             setTitleViewWithTitle(aTitle: libraryVC?.title ?? "")
-            navigationItem.rightBarButtonItem = UIBarButtonItem(title: YPConfig.wordings.next,
-                                                                style: .done,
+            navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Manage",
+                                                                style: .plain,
                                                                 target: self,
-                                                                action: #selector(done))
+                                                                action: #selector(manageButtonTapped))
             navigationItem.rightBarButtonItem?.tintColor = YPConfig.colors.tintColor
 
             // Disable Next Button until minNumberOfItems is reached.
@@ -690,6 +677,7 @@ open class YPPickerVC: YPBottomPager, YPBottomPagerDelegate {
             navigationItem.titleView = nil
             title = cameraVC?.title
             navigationItem.rightBarButtonItem = nil
+            
         case .video:
             navigationItem.titleView = nil
             title = videoVC?.title
@@ -699,6 +687,11 @@ open class YPPickerVC: YPBottomPager, YPBottomPagerDelegate {
         navigationItem.rightBarButtonItem?.setFont(font: YPConfig.fonts.rightBarButtonFont, forState: .normal)
         navigationItem.rightBarButtonItem?.setFont(font: YPConfig.fonts.rightBarButtonFont, forState: .disabled)
         navigationItem.leftBarButtonItem?.setFont(font: YPConfig.fonts.leftBarButtonFont, forState: .normal)
+    }
+
+    @objc func manageButtonTapped() {
+        // Handle "Manage" button tap
+        print("Manage button tapped")
     }
 
     @objc
