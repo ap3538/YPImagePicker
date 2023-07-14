@@ -397,6 +397,24 @@ protocol YPPickerVCDelegate: AnyObject {
     func shouldAddToSelection(indexPath: IndexPath, numSelections: Int) -> Bool
 }
 
+
+class CustomYPPickerVC: YPPickerVC {
+
+
+    override func updateUI() {
+        super.updateUI()
+
+        let manageButton = UIBarButtonItem(title: "Manage", style: .plain, target: self, action: #selector(manageButtonTapped))
+        navigationItem.rightBarButtonItem = manageButton
+    }
+
+    @objc func manageButtonTapped() {
+        // Handle "Manage" button tap
+        print("Manage button tapped")
+    }
+}
+
+
 open class YPPickerVC: YPBottomPager, YPBottomPagerDelegate {
 
     let albumsManager = YPAlbumsManager()
@@ -659,14 +677,13 @@ open class YPPickerVC: YPBottomPager, YPBottomPagerDelegate {
                                                                target: self,
                                                                action: #selector(close))
         }
-        
         switch mode {
         case .library:
             setTitleViewWithTitle(aTitle: libraryVC?.title ?? "")
-            navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Manage",
-                                                                style: .plain,
+            navigationItem.rightBarButtonItem = UIBarButtonItem(title: YPConfig.wordings.next,
+                                                                style: .done,
                                                                 target: self,
-                                                                action: #selector(manageButtonTapped))
+                                                                action: #selector(done))
             navigationItem.rightBarButtonItem?.tintColor = YPConfig.colors.tintColor
 
             // Disable Next Button until minNumberOfItems is reached.
@@ -677,7 +694,6 @@ open class YPPickerVC: YPBottomPager, YPBottomPagerDelegate {
             navigationItem.titleView = nil
             title = cameraVC?.title
             navigationItem.rightBarButtonItem = nil
-            
         case .video:
             navigationItem.titleView = nil
             title = videoVC?.title
