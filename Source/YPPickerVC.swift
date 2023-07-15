@@ -825,6 +825,8 @@ import UIKit
 import Stevia
 import Photos
 
+internal var selectedPhotos = [UIImage]()
+
 protocol YPPickerVCDelegate: AnyObject {
     func libraryHasNoItems()
     func shouldAddToSelection(indexPath: IndexPath, numSelections: Int) -> Bool
@@ -1110,7 +1112,7 @@ open class YPPickerVC: YPBottomPager, YPBottomPagerDelegate, UIImagePickerContro
             // Disable Next Button until minNumberOfItems is reached.
             navigationItem.rightBarButtonItem?.isEnabled =
                 libraryVC!.selectedItems.count >= YPConfig.library.minNumberOfItems
-            
+
         case .camera:
             navigationItem.titleView = nil
             title = cameraVC?.title
@@ -1135,6 +1137,21 @@ open class YPPickerVC: YPBottomPager, YPBottomPagerDelegate, UIImagePickerContro
         
         // Select More Photos action
         let selectMorePhotosAction = UIAlertAction(title: "Select More Photos", style: .default) { _ in
+            guard let libraryVC = self.libraryVC else {
+                ypLog("YPLibraryVC deallocated")
+                return
+            }
+            
+            if self.mode == .library {
+                libraryVC.selectedMedia(photoCallback: { photo in
+                    self.didSelectItems?([YPMediaItem.photo(p: photo)])
+                }, videoCallback: { video in
+                    self.didSelectItems?([YPMediaItem.video(v: video)])
+                }, multipleItemsCallback: { items in
+                    self.didSelectItems?(items)
+                })
+            }
+            
             let imagePickerController = UIImagePickerController()
             imagePickerController.sourceType = .photoLibrary
             imagePickerController.delegate = self
@@ -1165,6 +1182,7 @@ open class YPPickerVC: YPBottomPager, YPBottomPagerDelegate, UIImagePickerContro
         // Present action sheet
         self.present(actionSheet, animated: true, completion: nil)
     }
+
     
     @objc
     func close() {
@@ -1184,8 +1202,7 @@ open class YPPickerVC: YPBottomPager, YPBottomPagerDelegate, UIImagePickerContro
             libraryVC.selectedMedia(photoCallback: { photo in
                 self.didSelectItems?([YPMediaItem.photo(p: photo)])
             }, videoCallback: { video in
-                self.didSelectItems?([YPMediaItem
-                    .video(v: video)])
+                self.didSelectItems?([YPMediaItem.video(v: video)])
             }, multipleItemsCallback: { items in
                 self.didSelectItems?(items)
             })
