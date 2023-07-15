@@ -397,24 +397,6 @@ protocol YPPickerVCDelegate: AnyObject {
     func shouldAddToSelection(indexPath: IndexPath, numSelections: Int) -> Bool
 }
 
-
-class CustomYPPickerVC: YPPickerVC {
-
-
-    override func updateUI() {
-        super.updateUI()
-
-        let manageButton = UIBarButtonItem(title: "Manage", style: .plain, target: self, action: #selector(manageButtonTapped))
-        navigationItem.rightBarButtonItem = manageButton
-    }
-
-    @objc func manageButtonTapped() {
-        // Handle "Manage" button tap
-        print("Manage button tapped")
-    }
-}
-
-
 open class YPPickerVC: YPBottomPager, YPBottomPagerDelegate {
 
     let albumsManager = YPAlbumsManager()
@@ -538,6 +520,7 @@ open class YPPickerVC: YPBottomPager, YPBottomPagerDelegate {
             self.setNeedsStatusBarAppearanceUpdate()
         }
     }
+
 
     internal func pagerScrollViewDidScroll(_ scrollView: UIScrollView) { }
 
