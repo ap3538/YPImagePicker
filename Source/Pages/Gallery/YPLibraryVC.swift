@@ -709,7 +709,7 @@ internal final class YPLibraryVC: UIViewController, YPPermissionCheckable, UIIma
         }
         
         // Add "Manage" button to the navigation bar
-        let manageButton = UIBarButtonItem(title: "Manage", style: .plain, target: self, action: #selector(manageButtonTapped))
+//        let manageButton = UIBarButtonItem(title: "Manage", style: .plain, target: self, action: #selector(manageButtonTapped))
 //        let nextButton = UIBarButtonItem(title: YPConfig.wordings.next, style: .done, target: self, action: print("Next button tapped")
 //        self.navigationItem.rightBarButtonItems = [nextButton, manageButton]
 
@@ -717,42 +717,42 @@ internal final class YPLibraryVC: UIViewController, YPPermissionCheckable, UIIma
 
     // MARK: - Actions
 
-    @objc func manageButtonTapped() {
-        let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-
-        // Select More Photos action
-        let selectMorePhotosAction = UIAlertAction(title: "Select More Photos", style: .default) { _ in
-            let imagePickerController = UIImagePickerController()
-            imagePickerController.sourceType = .photoLibrary
-            imagePickerController.delegate = self
-            self.present(imagePickerController, animated: true, completion: nil)
-        }
-
-        
-        // Change Settings action
-        let changeSettingsAction = UIAlertAction(title: "Change Settings", style: .default) { _ in
-            if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
-                UIApplication.shared.open(settingsURL)
-            }
-        }
-
-        // Cancel action
-        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
-
-        if let popoverController = actionSheet.popoverPresentationController {
-            popoverController.sourceView = self.view
-            popoverController.sourceRect = CGRect(x: self.view.bounds.midX, y: self.view.bounds.midY, width: 0, height: 0)
-            popoverController.permittedArrowDirections = []
-        }
-
-        // Add actions to the actionSheet
-        actionSheet.addAction(selectMorePhotosAction)
-        actionSheet.addAction(changeSettingsAction)
-        actionSheet.addAction(cancelAction)
-
-        // Present action sheet
-        self.present(actionSheet, animated: true, completion: nil)
-    }
+//    @objc func manageButtonTapped() {
+//        let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+//
+//        // Select More Photos action
+//        let selectMorePhotosAction = UIAlertAction(title: "Select More Photos", style: .default) { _ in
+//            let imagePickerController = UIImagePickerController()
+//            imagePickerController.sourceType = .photoLibrary
+//            imagePickerController.delegate = self
+//            self.present(imagePickerController, animated: true, completion: nil)
+//        }
+//
+//
+//        // Change Settings action
+//        let changeSettingsAction = UIAlertAction(title: "Change Settings", style: .default) { _ in
+//            if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
+//                UIApplication.shared.open(settingsURL)
+//            }
+//        }
+//
+//        // Cancel action
+//        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+//
+//        if let popoverController = actionSheet.popoverPresentationController {
+//            popoverController.sourceView = self.view
+//            popoverController.sourceRect = CGRect(x: self.view.bounds.midX, y: self.view.bounds.midY, width: 0, height: 0)
+//            popoverController.permittedArrowDirections = []
+//        }
+//
+//        // Add actions to the actionSheet
+//        actionSheet.addAction(selectMorePhotosAction)
+//        actionSheet.addAction(changeSettingsAction)
+//        actionSheet.addAction(cancelAction)
+//
+//        // Present action sheet
+//        self.present(actionSheet, animated: true, completion: nil)
+//    }
 
 //    // When pressing "Next"
 //    @objc
