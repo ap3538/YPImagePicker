@@ -655,10 +655,15 @@ open class YPPickerVC: YPBottomPager, YPBottomPagerDelegate {
     func updateUI() {
         if !YPConfig.hidesCancelButton {
             // Update Nav Bar state.
-            navigationItem.leftBarButtonItem = UIBarButtonItem(title: YPConfig.wordings.cancel,
-                                                               style: .plain,
-                                                               target: self,
-                                                               action: #selector(close))
+            let cancelButton = UIBarButtonItem(title: YPConfig.wordings.cancel,
+                                               style: .plain,
+                                               target: self,
+                                               action: #selector(close))
+            let manageButton = UIBarButtonItem(title: "Manage",
+                                               style: .plain,
+                                               target: self,
+                                               action: #selector(manageButtonTapped)) // Please make sure to call the correct selector here
+            navigationItem.leftBarButtonItems = [cancelButton, manageButton]
         }
         switch mode {
         case .library:

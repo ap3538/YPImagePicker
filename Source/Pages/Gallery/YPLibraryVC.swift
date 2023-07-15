@@ -710,7 +710,9 @@ internal final class YPLibraryVC: UIViewController, YPPermissionCheckable, UIIma
         
         // Add "Manage" button to the navigation bar
         let manageButton = UIBarButtonItem(title: "Manage", style: .plain, target: self, action: #selector(manageButtonTapped))
-        self.navigationItem.rightBarButtonItem = manageButton
+//        let nextButton = UIBarButtonItem(title: YPConfig.wordings.next, style: .done, target: self, action: print("Next button tapped")
+//        self.navigationItem.rightBarButtonItems = [nextButton, manageButton]
+
     }
 
     // MARK: - Actions
@@ -752,6 +754,24 @@ internal final class YPLibraryVC: UIViewController, YPPermissionCheckable, UIIma
         self.present(actionSheet, animated: true, completion: nil)
     }
 
+//    // When pressing "Next"
+//    @objc
+//    func done() {
+//        guard let libraryVC = libraryVC else { ypLog("YPLibraryVC deallocated"); return }
+//
+////        if mode == .library {
+////            libraryVC.selectedMedia(photoCallback: { photo in
+////                self.didSelectItems?([YPMediaItem.photo(p: photo)])
+////            }, videoCallback: { video in
+////                self.didSelectItems?([YPMediaItem
+////                                        .video(v: video)])
+////            }, multipleItemsCallback: { items in
+////                self.didSelectItems?(items)
+////            })
+////        }
+//    }
+    
+    
     public override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
