@@ -397,7 +397,7 @@ protocol YPPickerVCDelegate: AnyObject {
     func shouldAddToSelection(indexPath: IndexPath, numSelections: Int) -> Bool
 }
 
-open class YPPickerVC: YPBottomPager, YPBottomPagerDelegate {
+open class YPPickerVC: YPBottomPager, YPBottomPagerDelegate, UIImagePickerControllerDelegate & UINavigationControllerDelegate {
 
     let albumsManager = YPAlbumsManager()
     var shouldHideStatusBar = false
@@ -693,11 +693,51 @@ open class YPPickerVC: YPBottomPager, YPBottomPagerDelegate {
         navigationItem.leftBarButtonItem?.setFont(font: YPConfig.fonts.leftBarButtonFont, forState: .normal)
     }
 
+    // MARK: - Actions
+
     @objc func manageButtonTapped() {
-        // Handle "Manage" button tap
+        let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        
         print("Manage button tapped")
+
+        // Select More Photos action
+        let selectMorePhotosAction = UIAlertAction(title: "Select More Photos", style: .default) { _ in
+            let imagePickerController = UIImagePickerController()
+            imagePickerController.sourceType = .photoLibrary
+            imagePickerController.delegate = self
+            self.present(imagePickerController, animated: true, completion: nil)
+        }
+
+        
+        // Change Settings action
+        let changeSettingsAction = UIAlertAction(title: "Change Settings", style: .default) { _ in
+            if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
+                UIApplication.shared.open(settingsURL)
+            }
+        }
+
+        // Cancel action
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+
+        if let popoverController = actionSheet.popoverPresentationController {
+            popoverController.sourceView = self.view
+            popoverController.sourceRect = CGRect(x: self.view.bounds.midX, y: self.view.bounds.midY, width: 0, height: 0)
+            popoverController.permittedArrowDirections = []
+        }
+
+        // Add actions to the actionSheet
+        actionSheet.addAction(selectMorePhotosAction)
+        actionSheet.addAction(changeSettingsAction)
+        actionSheet.addAction(cancelAction)
+
+        // Present action sheet
+        self.present(actionSheet, animated: true, completion: nil)
     }
 
+    
+    
+    
+    
     @objc
     func close() {
         // Cancelling exporting of all videos
