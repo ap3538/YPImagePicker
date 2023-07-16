@@ -1147,40 +1147,6 @@ open class YPPickerVC: YPBottomPager, YPBottomPagerDelegate, UIImagePickerContro
      }
     
     @objc
-    func checkPermission() {
-        let photoAuthorizationStatus = PHPhotoLibrary.authorizationStatus()
-        switch photoAuthorizationStatus {
-        case .authorized:
-            print("Access is granted by user")
-        case .notDetermined:
-            PHPhotoLibrary.requestAuthorization({ (newStatus) in
-                print("status is \(newStatus)")
-                if newStatus == PHAuthorizationStatus.authorized {
-                    print("success")
-                }
-            })
-        case .restricted:
-            print("User do not have access to photo album.")
-        case .denied:
-            print("User has denied the permission.")
-            // Provide an alert to guide user to Settings app
-            let alert = UIAlertController(title: "Access to photo library is denied",
-                                          message: "To enable access, tap Settings and turn on Photos.",
-                                          preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: "Settings", style: .default, handler: { _ in
-                if let url = URL(string: UIApplication.openSettingsURLString) {
-                    UIApplication.shared.open(url, options: [:], completionHandler: nil)
-                }
-            }))
-            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-            self.present(alert, animated: true, completion: nil)
-        case .limited:
-            print("User has granted limited access to the photo library.")
-        @unknown default:
-            print("Unknown case detected.")
-        }
-    }
-
     public func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         if let selectedImage = info[.originalImage] as? UIImage {
             // Handle the selected image
@@ -1199,11 +1165,10 @@ open class YPPickerVC: YPBottomPager, YPBottomPagerDelegate, UIImagePickerContro
         print("Manage button tapped")
 
         // Select More Photos action
+        // Select More Photos action
         let selectMorePhotosAction = UIAlertAction(title: "Select More Photos", style: .default) { _ in
-                self.checkPermission()
-                self.selectMorePhotos()
-           }
-
+            self.selectMorePhotos()
+        }
 
         // Change Settings action
         let changeSettingsAction = UIAlertAction(title: "Change Settings", style: .default) { _ in
