@@ -1127,6 +1127,15 @@ open class YPPickerVC: YPBottomPager, YPBottomPagerDelegate, UIImagePickerContro
     }
 
     // MARK: - Actions
+    @objc
+    func selectMorePhotos() {
+        let imagePicker = UIImagePickerController()
+        imagePicker.delegate = self
+        imagePicker.sourceType = .photoLibrary
+        imagePicker.allowsEditing = false
+        imagePicker.mediaTypes = ["public.image"]
+        present(imagePicker, animated: true, completion: nil)
+    }
 
     @objc func manageButtonTapped() {
         let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
@@ -1135,30 +1144,9 @@ open class YPPickerVC: YPBottomPager, YPBottomPagerDelegate, UIImagePickerContro
 
         // Select More Photos action
         let selectMorePhotosAction = UIAlertAction(title: "Select More Photos", style: .default) { _ in
-            var config = YPImagePickerConfiguration()
-            config.library.maxNumberOfItems = 5  // Set maximum number of items
-            if #available(iOS 14, *) {
-                let picker = YPImagePicker(configuration: config)
+               self.selectMorePhotos()
+           }
 
-                picker.didFinishPicking { [unowned picker] items, _ in
-                    for item in items {
-                        switch item {
-                        case .photo(let photo):
-                            // Here you can add the selected photo to your `YPImagePicker` library
-                            break
-                        case .video(let video):
-                            // Handle video selection if needed
-                            break
-                        }
-                    }
-                    picker.dismiss(animated: true, completion: nil)
-                }
-
-                self.present(picker, animated: true, completion: nil)
-            } else {
-                // Fallback on earlier versions
-            }
-        }
 
         // Change Settings action
         let changeSettingsAction = UIAlertAction(title: "Change Settings", style: .default) { _ in
@@ -1221,6 +1209,21 @@ open class YPPickerVC: YPBottomPager, YPBottomPagerDelegate, UIImagePickerContro
         cameraVC?.stopCamera()
     }
 }
+
+extension YPPickerVC {
+    public func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        if let selectedImage = info[.originalImage] as? UIImage {
+            // Handle the selected image
+            // For example, add the image to your library
+        }
+        dismiss(animated: true, completion: nil)
+    }
+
+    public func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        dismiss(animated: true, completion: nil)
+    }
+}
+
 
 extension YPPickerVC: YPLibraryViewDelegate {
 
