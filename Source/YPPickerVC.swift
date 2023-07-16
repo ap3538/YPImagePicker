@@ -1135,12 +1135,30 @@ open class YPPickerVC: YPBottomPager, YPBottomPagerDelegate, UIImagePickerContro
 
         // Select More Photos action
         let selectMorePhotosAction = UIAlertAction(title: "Select More Photos", style: .default) { _ in
-            let imagePickerController = UIImagePickerController()
-            imagePickerController.sourceType = .photoLibrary
-            imagePickerController.delegate = self
-            self.present(imagePickerController, animated: true, completion: nil)
-        }
+            var config = YPImagePickerConfiguration()
+            config.library.maxNumberOfItems = 5  // Set maximum number of items
+            if #available(iOS 14, *) {
+                let picker = YPImagePicker(configuration: config)
 
+                picker.didFinishPicking { [unowned picker] items, _ in
+                    for item in items {
+                        switch item {
+                        case .photo(let photo):
+                            // Here you can add the selected photo to your `YPImagePicker` library
+                            break
+                        case .video(let video):
+                            // Handle video selection if needed
+                            break
+                        }
+                    }
+                    picker.dismiss(animated: true, completion: nil)
+                }
+
+                self.present(picker, animated: true, completion: nil)
+            } else {
+                // Fallback on earlier versions
+            }
+        }
 
         // Change Settings action
         let changeSettingsAction = UIAlertAction(title: "Change Settings", style: .default) { _ in
