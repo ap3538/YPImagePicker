@@ -866,6 +866,13 @@ open class YPPickerVC: YPBottomPager, YPBottomPagerDelegate, UIImagePickerContro
     open override func viewDidLoad() {
         super.viewDidLoad()
 
+        // Create and configure the collection view layout
+               let layout = UICollectionViewFlowLayout()
+               layout.itemSize = CGSize(width: 100, height: 100)
+               layout.minimumInteritemSpacing = 10
+               layout.minimumLineSpacing = 10
+        
+        
         view.backgroundColor = YPConfig.colors.safeAreaBackgroundColor
 
         delegate = self
@@ -1158,14 +1165,17 @@ open class YPPickerVC: YPBottomPager, YPBottomPagerDelegate, UIImagePickerContro
                         DispatchQueue.main.async {
                             // Handle the selected image
                             self?.selectedImages.append(image)
-                            // Reload the collection view
-                            self?.galleryCollectionView.reloadData()
+                            // Check if galleryCollectionView is not nil before calling reloadData()
+                            if let galleryCollectionView = self?.galleryCollectionView {
+                                galleryCollectionView.reloadData()
+                            }
                         }
                     }
                 }
             }
         }
     }
+
 
     
     @objc
@@ -1176,7 +1186,9 @@ open class YPPickerVC: YPBottomPager, YPBottomPagerDelegate, UIImagePickerContro
 
         // Select More Photos action
         let selectMorePhotosAction = UIAlertAction(title: "Select More Photos", style: .default) { _ in
-            self.selectMorePhotos()
+            if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
+                UIApplication.shared.open(settingsURL)
+            }
         }
 
         // Change Settings action
