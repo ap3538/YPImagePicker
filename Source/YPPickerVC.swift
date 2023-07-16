@@ -1098,17 +1098,34 @@ open class YPPickerVC: YPBottomPager, YPBottomPagerDelegate, UIImagePickerContro
 
     func updateUI() {
         if !YPConfig.hidesCancelButton {
-            // Update Nav Bar state.
-            let cancelButton = UIBarButtonItem(title: YPConfig.wordings.cancel,
-                                               style: .plain,
-                                               target: self,
-                                               action: #selector(close))
-            let manageButton = UIBarButtonItem(title: "Manage",
-                                               style: .plain,
-                                               target: self,
-                                               action: #selector(manageButtonTapped)) // Please make sure to call the correct selector here
-            navigationItem.leftBarButtonItems = [cancelButton, manageButton]
-        }
+             // Update Nav Bar state.
+             let cancelButton = UIBarButtonItem(title: "",
+                                                style: .plain,
+                                                target: self,
+                                                action: #selector(close))
+             if #available(iOS 13.0, *) {
+                 cancelButton.image = UIImage(systemName: "xmark")
+             } else {
+                 // Fallback on earlier versions
+             }
+             
+             let manageButton: UIBarButtonItem
+             if #available(iOS 13.0, *) {
+                 manageButton = UIBarButtonItem(image: UIImage(systemName: "gearshape"),
+                                                style: .plain,
+                                                target: self,
+                                                action: #selector(manageButtonTapped))
+                 manageButton.image = UIImage(systemName: "gearshape")
+             } else {
+                 // Fallback on earlier versions
+                 manageButton = UIBarButtonItem(title: "Settings",
+                                                style: .plain,
+                                                target: self,
+                                                action: #selector(manageButtonTapped))
+             } // Make sure to call the correct selector
+             
+             navigationItem.leftBarButtonItems = [cancelButton, manageButton]
+         }
         switch mode {
         case .library:
             setTitleViewWithTitle(aTitle: libraryVC?.title ?? "")
@@ -1136,6 +1153,7 @@ open class YPPickerVC: YPBottomPager, YPBottomPagerDelegate, UIImagePickerContro
         navigationItem.rightBarButtonItem?.setFont(font: YPConfig.fonts.rightBarButtonFont, forState: .disabled)
         navigationItem.leftBarButtonItem?.setFont(font: YPConfig.fonts.leftBarButtonFont, forState: .normal)
     }
+
 
     // MARK: - Actions
     @objc
@@ -1185,21 +1203,21 @@ open class YPPickerVC: YPBottomPager, YPBottomPagerDelegate, UIImagePickerContro
         print("Manage button tapped")
 
         // Select More Photos action
-        let selectMorePhotosAction = UIAlertAction(title: "Select More Photos", style: .default) { _ in
+        let selectMorePhotosAction = UIAlertAction(title: "Seleccionar más fotos", style: .default) { _ in
             if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
                 UIApplication.shared.open(settingsURL)
             }
         }
 
         // Change Settings action
-        let changeSettingsAction = UIAlertAction(title: "Change Settings", style: .default) { _ in
+        let changeSettingsAction = UIAlertAction(title: "Cambiar configuraciones", style: .default) { _ in
             if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
                 UIApplication.shared.open(settingsURL)
             }
         }
 
         // Cancel action
-        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+        let cancelAction = UIAlertAction(title: "Cancelar", style: .cancel, handler: nil)
 
         if let popoverController = actionSheet.popoverPresentationController {
             popoverController.sourceView = self.view
