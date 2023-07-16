@@ -836,6 +836,8 @@ open class YPPickerVC: YPBottomPager, YPBottomPagerDelegate, UIImagePickerContro
     var shouldHideStatusBar = false
     var initialStatusBarHidden = false
     weak var pickerVCDelegate: YPPickerVCDelegate?
+    var selectedImages: [UIImage] = []
+    var galleryCollectionView: UICollectionView!
 
     override open var prefersStatusBarHidden: Bool {
         return (shouldHideStatusBar || initialStatusBarHidden) && YPConfig.hidesStatusBar
@@ -1128,23 +1130,78 @@ open class YPPickerVC: YPBottomPager, YPBottomPagerDelegate, UIImagePickerContro
 
     // MARK: - Actions
     @objc
-    func selectMorePhotos() {
-        let imagePicker = UIImagePickerController()
-        imagePicker.delegate = self
-        imagePicker.sourceType = .photoLibrary
-        imagePicker.allowsEditing = false
-        imagePicker.mediaTypes = ["public.image"]
-        present(imagePicker, animated: true, completion: nil)
+     func selectMorePhotos() {
+         let photoAuthorizationStatus = PHPhotoLibrary.authorizationStatus()
+         switch photoAuthorizationStatus {
+         case .authorized:
+             let imagePicker = UIImagePickerController()
+             imagePicker.delegate = self
+             imagePicker.sourceType = .photoLibrary
+             imagePicker.allowsEditing = false
+             imagePicker.mediaTypes = ["public.image"]
+             present(imagePicker, animated: true, completion: nil)
+         // handle other cases as per your requirement
+         default:
+             print("Access not granted or not determined")
+         }
+     }
+    
+    @objc
+    func checkPermission() {
+        let photoAuthorizationStatus = PHPhotoLibrary.authorizationStatus()
+        switch photoAuthorizationStatus {
+        case .authorized:
+            print("Access is granted by user")
+        case .notDetermined:
+            PHPhotoLibrary.requestAuthorization({ (newStatus) in
+                print("status is \(newStatus)")
+                if newStatus == PHAuthorizationStatus.authorized {
+                    print("success")
+                }
+            })
+        case .restricted:
+            print("User do not have access to photo album.")
+        case .denied:
+            print("User has denied the permission.")
+            // Provide an alert to guide user to Settings app
+            let alert = UIAlertController(title: "Access to photo library is denied",
+                                          message: "To enable access, tap Settings and turn on Photos.",
+                                          preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "Settings", style: .default, handler: { _ in
+                if let url = URL(string: UIApplication.openSettingsURLString) {
+                    UIApplication.shared.open(url, options: [:], completionHandler: nil)
+                }
+            }))
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+            self.present(alert, animated: true, completion: nil)
+        case .limited:
+            print("User has granted limited access to the photo library.")
+        @unknown default:
+            print("Unknown case detected.")
+        }
     }
 
-    @objc func manageButtonTapped() {
+    public func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        if let selectedImage = info[.originalImage] as? UIImage {
+            // Handle the selected image
+            self.selectedImages.append(selectedImage)
+            
+            // Reload the collection view
+            self.galleryCollectionView.reloadData()
+        }
+        dismiss(animated: true, completion: nil)
+    }
+    
+    @objc
+    func manageButtonTapped() {
         let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
 
         print("Manage button tapped")
 
         // Select More Photos action
         let selectMorePhotosAction = UIAlertAction(title: "Select More Photos", style: .default) { _ in
-               self.selectMorePhotos()
+                self.checkPermission()
+                self.selectMorePhotos()
            }
 
 
@@ -1172,10 +1229,6 @@ open class YPPickerVC: YPBottomPager, YPBottomPagerDelegate, UIImagePickerContro
         // Present action sheet
         self.present(actionSheet, animated: true, completion: nil)
     }
-
-
-
-
 
     @objc
     func close() {
@@ -1207,20 +1260,6 @@ open class YPPickerVC: YPBottomPager, YPBottomPagerDelegate, UIImagePickerContro
         libraryVC?.v.assetZoomableView.videoView.deallocate()
         videoVC?.stopCamera()
         cameraVC?.stopCamera()
-    }
-}
-
-extension YPPickerVC {
-    public func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-        if let selectedImage = info[.originalImage] as? UIImage {
-            // Handle the selected image
-            // For example, add the image to your library
-        }
-        dismiss(animated: true, completion: nil)
-    }
-
-    public func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
-        dismiss(animated: true, completion: nil)
     }
 }
 
