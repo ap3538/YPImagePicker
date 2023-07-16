@@ -824,13 +824,15 @@
 import UIKit
 import Stevia
 import Photos
+import PhotosUI
+
 
 protocol YPPickerVCDelegate: AnyObject {
     func libraryHasNoItems()
     func shouldAddToSelection(indexPath: IndexPath, numSelections: Int) -> Bool
 }
 
-open class YPPickerVC: YPBottomPager, YPBottomPagerDelegate, UIImagePickerControllerDelegate & UINavigationControllerDelegate {
+open class YPPickerVC: YPBottomPager, YPBottomPagerDelegate, UIImagePickerControllerDelegate & UINavigationControllerDelegate, PHPickerViewControllerDelegate {
 
     let albumsManager = YPAlbumsManager()
     var shouldHideStatusBar = false
@@ -1130,33 +1132,41 @@ open class YPPickerVC: YPBottomPager, YPBottomPagerDelegate, UIImagePickerContro
 
     // MARK: - Actions
     @objc
-     func selectMorePhotos() {
-         let photoAuthorizationStatus = PHPhotoLibrary.authorizationStatus()
-         switch photoAuthorizationStatus {
-         case .authorized:
-             let imagePicker = UIImagePickerController()
-             imagePicker.delegate = self
-             imagePicker.sourceType = .photoLibrary
-             imagePicker.allowsEditing = false
-             imagePicker.mediaTypes = ["public.image"]
-             present(imagePicker, animated: true, completion: nil)
-         // handle other cases as per your requirement
-         default:
-             print("Access not granted or not determined")
-         }
-     }
-    
-    @objc
-    public func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-        if let selectedImage = info[.originalImage] as? UIImage {
-            // Handle the selected image
-            self.selectedImages.append(selectedImage)
-            
-            // Reload the collection view
-            self.galleryCollectionView.reloadData()
+    func selectMorePhotos() {
+        if #available(iOS 14, *) {
+            var configuration = PHPickerConfiguration()
+            configuration.selectionLimit = 0
+            configuration.filter = .images
+
+            let picker = PHPickerViewController(configuration: configuration)
+            picker.delegate = self
+            present(picker, animated: true)
+        } else {
+            // Fallback on earlier versions
         }
-        dismiss(animated: true, completion: nil)
     }
+
+    
+    @available(iOS 14, *)
+    public func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+        dismiss(animated: true)
+        let itemProviders = results.map(\.itemProvider)
+        for itemProvider in itemProviders {
+            if itemProvider.canLoadObject(ofClass: UIImage.self) {
+                itemProvider.loadObject(ofClass: UIImage.self) { [weak self] (image, error) in
+                    if let image = image as? UIImage {
+                        DispatchQueue.main.async {
+                            // Handle the selected image
+                            self?.selectedImages.append(image)
+                            // Reload the collection view
+                            self?.galleryCollectionView.reloadData()
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     
     @objc
     func manageButtonTapped() {
@@ -1164,7 +1174,6 @@ open class YPPickerVC: YPBottomPager, YPBottomPagerDelegate, UIImagePickerContro
 
         print("Manage button tapped")
 
-        // Select More Photos action
         // Select More Photos action
         let selectMorePhotosAction = UIAlertAction(title: "Select More Photos", style: .default) { _ in
             self.selectMorePhotos()
